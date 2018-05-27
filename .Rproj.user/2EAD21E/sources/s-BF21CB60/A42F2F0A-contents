@@ -1,0 +1,35 @@
+library(readr)
+library(tidyr)
+library(ggplot2)
+X105 <- read_csv("C:/Users/user/Downloads/105.csv")
+X105<-X105[,-(4:6)]
+Data7<-Data7%>%rename("學生人數"=總人數)
+Data7<-X105%>%arrange(desc(學生人數))
+Data7%>%head(10)
+#8............................................
+Data8_1<-left_join(Data7,Country,by="國別")
+Data8_1<-Data8_1[complete.cases(Data8_1),]
+Data8_2<-data.frame(region=Data8_1$English,
+                 value=Data8_1$總人數)
+Data8_2<-Data8_2%>%
+  group_by(region)%>%
+  summarise(value=sum(value))
+chart8<-country_choropleth(Data8_2,title = "台灣學生去各國家留學人數分布圖")+ 
+  scale_fill_brewer(name="學生人數", palette=2)
+chart8
+#9..............................................
+compare<-inner_join(Result1,Q4_1,by="國別")
+compare<-compare%>%
+  rename("來台學生人數"=總人數,
+         "留學人數"=學生人數)
+#9_2............................................
+compare2<-gather(compare,key=種類,value=人數,來台學生人數,留學人數)
+compare2<-compare2%>%arrange(desc(人數))
+#9_2圖.............................................
+compare2$國家 <- reorder(compare2$國別, compare2$人數)
+chart9<-ggplot()+geom_bar(data=compare2%>%head(50),
+                  aes(x=國家,y=人數),
+                  stat="identity")+
+         facet_grid(.~種類)+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+chart9
