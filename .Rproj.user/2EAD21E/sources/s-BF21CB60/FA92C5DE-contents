@@ -184,6 +184,7 @@ Q4_2<-student2%>%
 但比較意外的發現是剛剛來台學校第一的台灣師範大學不在前10名內。
 與上題一起分析的話，大概可以猜測這些學校(台大、政大、成大、淡江、逢甲等)
 比較有在推廣交換學生這個部分。
+
 ```{r kableQ4_2}
 kable(Q4_2%>%head(10))
 ```
@@ -246,6 +247,7 @@ compare2$國家 <- reorder(compare2$國別, compare2$人數)
 
 在這邊可以發現台灣學生如果選擇留學的話(不是進修)
 就會比較嚮往歐美國家，亞洲國家就減少很多。
+
 ```{r kableData7}
 Data7<-X105%>%arrange(desc(總人數))
 kable(Data7%>%head(10))
@@ -292,4 +294,5 @@ chart9<-ggplot()+geom_bar(data=compare2%>%head(30),
   theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
 chart9
 ```
+
 以上是畫圖的部分，利用子圖的方式，想同時呈現來台學生人數與留學人數的差距比較，但是由於中國大陸的數值相差太懸殊，所以顯得留學人數呈現部分只佔比較少數。
