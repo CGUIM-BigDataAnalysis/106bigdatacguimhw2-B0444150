@@ -21,12 +21,12 @@ library(choroplethrMaps)
 library(choroplethr)
 library(knitr)
 library(tidyr)
-#整理各國學生來台念書的資料表
+#匯入各國學生來台念書的資料表
 school103 <- read_csv("http://stats.moe.gov.tw/files/detail/103/103_ab103_C.csv")
 school104 <- read_csv("http://stats.moe.gov.tw/files/detail/104/104_ab104_C.csv")
 school105 <- read_csv("http://stats.moe.gov.tw/files/detail/105/105_ab105_C.csv")
 school106 <- read_csv("http://stats.moe.gov.tw/files/detail/106/106_ab105_C.csv")
-
+#將每年的各國學生來台念書表統整成一個總表
 Data1<-rbind(school103,school104)
 Data2<-rbind(school105,school106)
 Data2<-Data2%>%
@@ -45,12 +45,12 @@ for(i in 1:nrow(DataFinal))
 {
   total<-c(total,rowSums(DataFinal[i,3:11]))
 }
-#整理個學校境外生的資料表
+#匯入每年各學校境外生的資料表
 college103 <- read_csv("http://stats.moe.gov.tw/files/detail/103/103_ab103_S.csv")
 college104 <- read_csv("http://stats.moe.gov.tw/files/detail/104/104_ab104_S.csv")
 college105 <- read_csv("http://stats.moe.gov.tw/files/detail/105/105_ab105_S.csv")
 college106 <- read_csv("http://stats.moe.gov.tw/files/detail/106/106_ab105_S.csv")
-
+#將每年各學校境外生的資料整理成一個總表
 Data1_1<-rbind(college103,college104)
 Data1_2<-rbind(college105,college106)
 Data1_2<-Data1_2%>%
@@ -63,6 +63,7 @@ Data1_2<-Data1_2%>%
                    "非學位生-大陸研修生"="非學位生_大陸研修生",
                    "非學位生-海青班"="非學位生_海青班")
 DataFinal1<-rbind(Data1_1,Data1_2)
+#因為此欄位皆為".."，因此將其轉成0，方便計算
 DataFinal1$`非學位生-大陸研修生`<-0
 #計算台灣學校境外生人數總和
 Total<-NULL
@@ -70,7 +71,7 @@ for(k in 1:nrow(DataFinal1))
 {
   Total<-c(Total,rowSums(DataFinal1[k,4:11]))
 }
-#匯入國家中英文對照表
+#匯入國家中英文對照表(畫面量表時需要用到)
 Country <- read_csv("C:/Users/user/Downloads/CountriesComparisionTable.csv")
 Country <-Country[,-1]
 Country<-Country%>%rename(國別=Taiwan)
@@ -103,6 +104,7 @@ Result2<-DataFinal1%>%
   summarise(總人數=sum(人數))%>%
   arrange(desc(總人數))
 ```
+
 藉由下表可看出台師大的境外生最多，接著是台大，
 但是私立學校的比例好像佔比較大多數。
 ```{r kableResult2}
@@ -167,16 +169,18 @@ chartO
 
 ### 各個國家來台灣唸書的學生人數面量圖
 ```{r ToTWNCountryMap}
-#join來台國家與國家中英文對照表
+#用left_join結合來台國家與國家中英文對照表
 Result3<-left_join(Result1,Country,by="國別")
 #去除遺漏值
 Result3<-Result3[complete.cases(Result3),]
 #新建一個資料框，裡面放region(地區)與value(總人數)值
 Result3_1<-data.frame(region=Result3$English,
                       value=Result3$總人數)
+#統計value人數總和
 Result3_1<-Result3_1%>%
            group_by(region)%>%
            summarise(value=sum(value))
+#繪製面量圖(各個國家來台灣唸書的學生人數)
 chart3<-country_choropleth(Result3_1,title = "各個國家來台灣唸書的學生人數分布圖")+ 
         scale_fill_brewer(name="學生人數", palette=1)
 ```
@@ -187,7 +191,10 @@ chart3<-country_choropleth(Result3_1,title = "各個國家來台灣唸書的學�
 chart3
 ```
 
+-
 小結:藉由以上資料，我們可以知道中國大陸來台的學生人數真的很多，遠遠大於其他國家倍數的人數，而因地理位置的關係，亞洲地區的人數又佔大多數，美國學生成了特別的例子，這可能也說明了台灣有一些競爭力，才會讓他們想來台灣留學吧。
+
+
 
 ## 台灣學生國際交流分析
 
@@ -199,6 +206,7 @@ student <- read.csv("C:/Users/user/Desktop/student.csv", header=FALSE,stringsAsF
 colnames(student)<-c(student[1,])
 #刪除第一列(因為第一列為欄位名稱)
 student<-student[-1,]
+#只篩選103.104年度的資料
 student2<-student%>%
           filter(學年度=="103"|學年度=="104")
 student2$出國學生人數<-as.numeric(student2$出國學生人數)
@@ -207,19 +215,20 @@ student2$出國學生人數<-as.numeric(student2$出國學生人數)
 
 ### 台灣大專院校的學生最喜歡去哪些國家進修交流呢？
 ```{r FromTWNCountry}
+#先進行第一次統整與篩選，選出國別、學生人數總和
 Q4_1<-student2%>%
   rename(國別=對方學校國別)%>%
   group_by(國別)%>%
   summarise(學生人數=sum(出國學生人數))%>%
   arrange(desc(學生人數))
-#處理國別相同的國家
+#篩選後再處理國別相同的國家(其名字不同但為相同國家者)
 Q4_1$國別<-gsub("共和國|王國|和平之國|聯邦|社會主義","",Q4_1$國別)
 Q4_1$國別<-gsub("大陸地區","中國大陸",Q4_1$國別)
 Q4_1[4,2]<-Q4_1[4,2]+Q4_1[14,2]
 Q4_1[16,2]<-Q4_1[16,2]+Q4_1[25,2]
 Q4_1[6,2]<-Q4_1[6,2]+Q4_1[19,2]
 Q4_1<-Q4_1[-c(14,19,25),]
-
+#第二次統整，篩選出國別與學生人數
 Q4_1_1<-Q4_1%>%
         group_by(國別)%>%
         summarise(學生人數=sum(學生人數))%>%
@@ -248,11 +257,9 @@ Q4_2<-student2%>%
 kable(Q4_2%>%head(10))
 ```
 
-
-
 ### 台灣大專院校的學生最喜歡去哪些國家進修交流條狀圖
 ```{r FromTWNCountryBar}
-#因為畫全部國家的條狀圖實在是太多太小了，所以在這邊只取前50個國家。
+#因為畫全部國家的條狀圖實在是太多太小了，所以在這邊只取前30個國家。
 chart5<-ggplot()+
   geom_bar(data=Q4_1_1%>%head(30),
            aes(x=國別,y=學生人數),
@@ -263,7 +270,7 @@ chart5
 
 ### 台灣大專院校的學生最喜歡去哪些國家進修交流面量圖
 ```{r FromTWNCountryMap}
-#join留學國家與國家中英文對照表
+#使用left_join結合留學國家表與國家中英文對照表
 Q6<-left_join(Q4_1_1,Country,by="國別")
 #去除遺漏值
 Q6<-Q6[complete.cases(Q6),]
@@ -284,15 +291,18 @@ chart6<-country_choropleth(Q6_1,title = "台灣大專院校(全部)的學生去�
 chart6
 ```
 
+-
 小結:從上面的表格可以發現交換學生的學校，大部分都是在北部，
 可以推測北部的學校可能資源比較多，也會較重視國際交流的部分。
 在國家方面可以發現台灣學生喜歡去英文體系的國家，
 提升英文能力變得越來越重要了。
 
+
 ## 台灣學生出國留學分析
 
 ### 資料匯入與處理
 ```{r dataloadFromTWNAb}
+#整理匯入的資料
 X105<-read_csv("C:/Users/user/Downloads/105.csv")
 X105<-X105[,-(4:6)]
 
@@ -305,7 +315,7 @@ compare<-compare%>%
 
 ### 台灣學生最喜歡去哪些國家留學呢？
 
-在這邊可以發現台灣學生如果選擇留學的話(不是進修)
+在這邊可以推測台灣學生如果選擇留學的話(不是進修)
 就會比較嚮往歐美國家，亞洲國家就減少很多。
 
 ```{r kableData7}
@@ -313,11 +323,9 @@ Data7<-X105%>%arrange(desc(總人數))
 kable(Data7%>%head(10))
 ```
 
-
-
 ### 台灣學生最喜歡去哪些國家留學面量圖
 ```{r FromTWNAbMap}
-#join留學資料表與國家中英文對照表
+#left_join留學資料表與國家中英文對照表
 Data8_1<-left_join(Data7,Country,by="國別")
 #去除遺漏值
 Data8_1<-Data8_1[complete.cases(Data8_1),]
@@ -340,11 +348,13 @@ chart8
 ### 綜合分析
 請問來台讀書與離台讀書的來源國與留學國趨勢是否相同(5分)？想來台灣唸書的境外生，他們的母國也有很多台籍生嗎？請圖文並茂說明你的觀察(10分)。
 
-compare這個資料表是比較來台與留學的人數，只比較有來台學生的國家且該國家也有台籍留學生。
+compare這個資料表是用來比較來台人數與留學人數(只比較有來台學生的國家且該國家也有台籍留學生。)
 可以發現中國大陸佔居最大部分，次之的是馬來西亞，前幾名都是鄰近台灣的國家。
+而有一個小小的發現是:前十名內唯一一個國家不在亞洲的是美國。
 先以表個的方式呈現數值，因為畫圖的部分比較不清楚。
 
-我覺得來源國與留學國(我是用進修交流的表作分析)的趨勢滿接近的，雖然留學人數相對都比較少(可能因為台灣人口相對世界各國比較少)，但是只要是在台灣有一定比例的國家，來台灣留學的人數也滿多的，但是南亞部分就差距比較多(來台的多，去的少)，我認為是因為國家發展的關係，所以台灣去的人沒有它們來的多，以上是我的觀察。
+我覺得來源國與留學國(使用進修交流的表作分析)的趨勢滿接近的，雖然留學人數相對都比較少(可能因為台灣人口相對世界各國比較少)，但是只要是在台灣有一定比例學生的國家，台灣去該國留學的人數也滿多的，但是南亞部分就差距比較多(來台的多，去的少)，我認為是因為國家發展的關係，所以台灣去留學的學生相對之下比較少，以上是我的觀察。
+(以下是作圖的部分，利用子圖的方式，想同時呈現來台學生人數與留學人數的差距比較，但是由於中國大陸的數值相差太懸殊，所以顯得留學人數呈現部分只佔比較少數。)
 ```{r analysis}
 kable(compare%>%head(20))
 
@@ -352,13 +362,13 @@ kable(compare%>%head(20))
 compare2<-gather(compare,key=種類,value=人數,來台學生人數,留學人數)
 compare2<-compare2%>%arrange(desc(人數))
 compare2$國家 <- reorder(compare2$國別, compare2$人數)
-chart9<-ggplot()+geom_bar(data=compare2%>%head(30),
-                  aes(x=國家,y=人數),
-                  stat="identity")+
-         facet_grid(.~種類)+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+chart9<-ggplot()+
+        geom_bar(data=compare2%>%head(20),
+                 aes(x=國家,y=人數),
+                 stat="identity")+
+        facet_grid(.~種類)+
+        theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
 chart9
 
 ```
 
-以上是畫圖的部分，利用子圖的方式，想同時呈現來台學生人數與留學人數的差距比較，但是由於中國大陸的數值相差太懸殊，所以顯得留學人數呈現部分只佔比較少數。

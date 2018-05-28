@@ -80,6 +80,52 @@ Result2<-DataFinal1%>%
 Result2%>%head(10)
 
 #承1，請用bar chart呈現各個國家(全部)來台灣唸書的學生人數
+#亞洲...................................................................
+Asian<-Result1%>%filter(洲別=="亞洲")
+chartA<-ggplot(title="亞洲")+
+  geom_bar(data=Asian,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))+
+  ggtitle("亞洲")
+chartA
+?geom_bar
+#歐洲.........................................................................
+Europe<-Result1%>%filter(洲別=="歐洲")
+chartE<-ggplot()+
+  geom_bar(data=Europe,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+chartE
+#美洲.....................................................................
+America<-Result1%>%filter(洲別=="美洲")
+chartAm<-ggplot()+
+  geom_bar(data=America,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+chartAm
+#非洲........................................................................
+Africa<-Result1%>%filter(洲別=="非洲")
+chartAf<-ggplot()+
+  geom_bar(data=Africa,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+chartAf
+#大洋洲.........
+Oceania<-Result1%>%filter(洲別=="大洋洲")
+chartO<-ggplot()+
+  geom_bar(data=Oceania,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+chartO
+
+
+
+
 chart1<-ggplot()+
         geom_bar(data=Result1%>%head(30),
                  aes(x=國別,y=總人數),
@@ -107,12 +153,25 @@ student2<-student%>%
 student2$出國學生人數<-as.numeric(student2$出國學生人數)
 
 #.................................................................................
+
+
 Q4_1<-student2%>%
   rename(國別=對方學校國別)%>%
   group_by(國別)%>%
   summarise(學生人數=sum(出國學生人數))%>%
   arrange(desc(學生人數))
-Q4_1%>%head(10)
+Q4_1$國別<-gsub("共和國|王國|和平之國||聯邦","",Q4_1$國別)
+Q4_1$國別<-gsub("大陸地區","中國大陸",Q4_1$國別)
+Q4_1[4,2]<-Q4_1[4,2]+Q4_1[14,2]
+Q4_1[16,2]<-Q4_1[16,2]+Q4_1[25,2]
+Q4_1[6,2]<-Q4_1[6,2]+Q4_1[19,2]
+Q4_1<-Q4_1[-c(14,19,25),]
+Q4_1_1<-Q4_1%>%
+        group_by(國別)%>%
+        summarise(學生人數=sum(學生人數))%>%
+        arrange(desc(學生人數))
+Q4_1_1%>%head(10)
+
 
 Q4_2<-student2%>%
   group_by(學校名稱)%>%
@@ -121,12 +180,12 @@ Q4_2<-student2%>%
 Q4_2%>%head(10)
 #承4，請用bar chart呈現台灣大專院校(全部)的學生去各國家進修交流人數(10分)。
 chart5<-ggplot()+
-  geom_bar(data=Q4_1%>%head(30),
+  geom_bar(data=Q4_1_1,
            aes(x=國別,y=學生人數),
            stat="identity")+
   theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+ 
 chart5
-
 
 #承4，請用面量圖呈現台灣大專院校的學生去各國家進修交流人數，人數越多顏色越深(10分)。
 Q6<-left_join(Q4_1,Country,by="國別")
@@ -174,5 +233,4 @@ chart9<-ggplot()+
         facet_grid(.~種類)+
         theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
 chart9
-
 
