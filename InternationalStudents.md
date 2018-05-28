@@ -365,16 +365,80 @@ kable((Result2%>%head(10)))
 ### 各個國家來台灣唸書的學生人數條狀圖
 
 ``` r
-#因為畫全部國家的條狀圖實在是太多太小了，所以在這邊只取前50個國家。
-chart1<-ggplot()+
-        geom_bar(data=Result1%>%head(50),
-                 aes(x=國別,y=總人數),
-                 stat="identity")+
-        theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
-chart1
+#因為畫全部國家的條狀圖太多太小了，所以在這邊分成五大洲來畫。
+#亞洲...................................................................
+Asian<-Result1%>%filter(洲別=="亞洲")
+chartA<-ggplot()+
+  geom_bar(data=Asian,
+           aes(x=國別,y=總人數),
+           stat="identity",title="亞洲")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))+
+  ggtitle("亞洲")
+```
+
+    ## Warning: Ignoring unknown parameters: title
+
+``` r
+chartA
 ```
 
 ![](InternationalStudents_files/figure-markdown_github/ToTWNCountryBar-1.png)
+
+``` r
+#歐洲.........................................................................
+Europe<-Result1%>%filter(洲別=="歐洲")
+chartE<-ggplot()+
+  geom_bar(data=Europe,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))+
+  ggtitle("歐洲")
+chartE
+```
+
+![](InternationalStudents_files/figure-markdown_github/ToTWNCountryBar-2.png)
+
+``` r
+#美洲.....................................................................
+America<-Result1%>%filter(洲別=="美洲")
+chartAm<-ggplot()+
+  geom_bar(data=America,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))+
+  ggtitle("美洲")
+chartAm
+```
+
+![](InternationalStudents_files/figure-markdown_github/ToTWNCountryBar-3.png)
+
+``` r
+#非洲........................................................................
+Africa<-Result1%>%filter(洲別=="非洲")
+chartAf<-ggplot()+
+  geom_bar(data=Africa,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))+
+  ggtitle("非洲")
+chartAf
+```
+
+![](InternationalStudents_files/figure-markdown_github/ToTWNCountryBar-4.png)
+
+``` r
+#大洋洲.........
+Oceania<-Result1%>%filter(洲別=="大洋洲")
+chartO<-ggplot()+
+  geom_bar(data=Oceania,
+           aes(x=國別,y=總人數),
+           stat="identity")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))+
+  ggtitle("大洋洲")
+chartO
+```
+
+![](InternationalStudents_files/figure-markdown_github/ToTWNCountryBar-5.png)
 
 ### 各個國家來台灣唸書的學生人數面量圖
 
@@ -438,30 +502,42 @@ student2$出國學生人數<-as.numeric(student2$出國學生人數)
 
 ``` r
 Q4_1<-student2%>%
-      rename(國別=對方學校國別)%>%
-      group_by(國別)%>%
-      summarise(學生人數=sum(出國學生人數))%>%
-      arrange(desc(學生人數))
+  rename(國別=對方學校國別)%>%
+  group_by(國別)%>%
+  summarise(學生人數=sum(出國學生人數))%>%
+  arrange(desc(學生人數))
+#處理國別相同的國家
+Q4_1$國別<-gsub("共和國|王國|和平之國|聯邦|社會主義","",Q4_1$國別)
+Q4_1$國別<-gsub("大陸地區","中國大陸",Q4_1$國別)
+Q4_1[4,2]<-Q4_1[4,2]+Q4_1[14,2]
+Q4_1[16,2]<-Q4_1[16,2]+Q4_1[25,2]
+Q4_1[6,2]<-Q4_1[6,2]+Q4_1[19,2]
+Q4_1<-Q4_1[-c(14,19,25),]
+
+Q4_1_1<-Q4_1%>%
+        group_by(國別)%>%
+        summarise(學生人數=sum(學生人數))%>%
+        arrange(desc(學生人數))
 ```
 
 可以發現台灣的學生除了會往比較近的國家像是中國或日本之外 還喜歡往歐洲體系、美國地區跑。
 
 ``` r
-kable(Q4_1%>%head(10))
+kable(Q4_1_1%>%head(10))
 ```
 
 | 國別     | 學生人數 |
 |:---------|:--------:|
-| 中國大陸 |   8375   |
+| 中國大陸 |   9891   |
 | 日本     |   7142   |
 | 美國     |   4427   |
-| 南韓     |   2050   |
-| 大陸地區 |   1516   |
-| 德國     |   1466   |
+| 南韓     |   2565   |
+| 德國     |   1767   |
 | 法國     |   1258   |
 | 英國     |    742   |
+| 西班牙   |    721   |
 | 加拿大   |    689   |
-| 西班牙   |    642   |
+| 新加坡   |    673   |
 
 ### 哪間大學的出國交流學生數最多呢？
 
@@ -496,7 +572,7 @@ kable(Q4_2%>%head(10))
 ``` r
 #因為畫全部國家的條狀圖實在是太多太小了，所以在這邊只取前50個國家。
 chart5<-ggplot()+
-  geom_bar(data=Q4_1%>%head(50),
+  geom_bar(data=Q4_1_1%>%head(30),
            aes(x=國別,y=學生人數),
            stat="identity")+
   theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
@@ -509,7 +585,7 @@ chart5
 
 ``` r
 #join留學國家與國家中英文對照表
-Q6<-left_join(Q4_1,Country,by="國別")
+Q6<-left_join(Q4_1_1,Country,by="國別")
 #去除遺漏值
 Q6<-Q6[complete.cases(Q6),]
 #新建一個資料框以符合畫圖需求
@@ -537,9 +613,9 @@ chart6<-country_choropleth(Q6_1,title = "台灣大專院校(全部)的學生去�
     ## turkmenistan, east timor, bulgaria, trinidad and tobago, taiwan, united
     ## republic of tanzania, uganda, ukraine, uruguay, uzbekistan, the bahamas,
     ## venezuela, vanuatu, yemen, zambia, zimbabwe, bosnia and herzegovina,
-    ## belarus, albania, belize, bolivia, bhutan, botswana, central african
-    ## republic, united arab emirates, ivory coast, cameroon, democratic republic
-    ## of the congo, republic of congo, cuba, northern cyprus, cyprus, argentina,
+    ## albania, belize, bolivia, bhutan, botswana, central african republic,
+    ## united arab emirates, ivory coast, cameroon, democratic republic of
+    ## the congo, republic of congo, cuba, northern cyprus, cyprus, argentina,
     ## djibouti, dominican republic, algeria, eritrea, armenia, ethiopia,
     ## fiji, gabon, georgia, ghana, antarctica, guinea, gambia, guinea bissau,
     ## equatorial guinea, guatemala, guyana, honduras, haiti, iran, iraq, jamaica,
@@ -584,14 +660,10 @@ X105<-read_csv("C:/Users/user/Downloads/105.csv")
 X105<-X105[,-(4:6)]
 
 #為了比較來台人數與留學人數做了一個比較表
-compare<-inner_join(Result1,Q4_1,by="國別")
+compare<-inner_join(Result1,Q4_1_1,by="國別")
 compare<-compare%>%
          rename("來台學生人數"=總人數,
                 "留學人數"=學生人數)
-#為了畫圖方便做的比較表
-compare2<-gather(compare,key=種類,value=人數,來台學生人數,留學人數)
-compare2<-compare2%>%arrange(desc(人數))
-compare2$國家 <- reorder(compare2$國別, compare2$人數)
 ```
 
 ### 台灣學生最喜歡去哪些國家留學呢？
@@ -680,7 +752,7 @@ chart8
 
 compare這個資料表是比較來台與留學的人數，只比較有來台學生的國家且該國家也有台籍留學生。 可以發現中國大陸佔居最大部分，次之的是馬來西亞，前幾名都是鄰近台灣的國家。 先以表個的方式呈現數值，因為畫圖的部分比較不清楚。
 
-我覺得來源國與留學國(我是用進修交流的表作分析)的趨勢滿接近的，雖然留學人數相對都比較少(可能因為台灣人口相對世界各國比較少)，但是只要是在台灣有一定比例的國家，台灣留學的人數也滿多的，但是南亞部分就差距比較多(來台的多，去的少)，我認為是因為國家發展的關係，所以台灣去的人沒有它們來的多，以上是我的觀察。
+我覺得來源國與留學國(我是用進修交流的表作分析)的趨勢滿接近的，雖然留學人數相對都比較少(可能因為台灣人口相對世界各國比較少)，但是只要是在台灣有一定比例的國家，來台灣留學的人數也滿多的，但是南亞部分就差距比較多(來台的多，去的少)，我認為是因為國家發展的關係，所以台灣去的人沒有它們來的多，以上是我的觀察。
 
 ``` r
 kable(compare%>%head(20))
@@ -688,28 +760,32 @@ kable(compare%>%head(20))
 
 | 洲別   | 國別     | 來台學生人數 | 留學人數 |
 |:-------|:---------|:------------:|:--------:|
-| 亞洲   | 中國大陸 |    152524    |   8375   |
+| 亞洲   | 中國大陸 |    152524    |   9891   |
 | 亞洲   | 馬來西亞 |     62031    |    509   |
 | 亞洲   | 香港     |     31940    |    572   |
 | 亞洲   | 日本     |     28200    |   7142   |
-| 亞洲   | 越南     |     21670    |    111   |
+| 亞洲   | 越南     |     21670    |    123   |
 | 亞洲   | 澳門     |     20302    |    57    |
 | 亞洲   | 印尼     |     19620    |    32    |
-| 亞洲   | 南韓     |     16948    |   2050   |
+| 亞洲   | 南韓     |     16948    |   2565   |
 | 美洲   | 美國     |     14846    |   4427   |
-| 亞洲   | 泰國     |     7035     |    410   |
+| 亞洲   | 泰國     |     7035     |    572   |
 | 歐洲   | 法國     |     6558     |   1258   |
-| 亞洲   | 印度     |     4845     |    37    |
-| 歐洲   | 德國     |     4535     |   1466   |
+| 亞洲   | 印度     |     4845     |    43    |
+| 歐洲   | 德國     |     4535     |   1767   |
 | 亞洲   | 蒙古     |     3843     |     2    |
-| 亞洲   | 新加坡   |     2928     |    569   |
+| 亞洲   | 新加坡   |     2928     |    673   |
 | 美洲   | 加拿大   |     2742     |    689   |
-| 亞洲   | 菲律賓   |     2708     |    93    |
+| 亞洲   | 菲律賓   |     2708     |    149   |
 | 大洋洲 | 澳大利亞 |     1758     |    557   |
 | 歐洲   | 英國     |     1713     |    742   |
-| 亞洲   | 俄羅斯   |     1593     |    301   |
+| 亞洲   | 俄羅斯   |     1593     |    36    |
 
 ``` r
+#為了畫子圖，重新建立一個比較表，將來台人數與留學人數轉為長表
+compare2<-gather(compare,key=種類,value=人數,來台學生人數,留學人數)
+compare2<-compare2%>%arrange(desc(人數))
+compare2$國家 <- reorder(compare2$國別, compare2$人數)
 chart9<-ggplot()+geom_bar(data=compare2%>%head(30),
                   aes(x=國家,y=人數),
                   stat="identity")+
