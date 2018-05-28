@@ -1,6 +1,6 @@
 106-2 大數據分析方法 作業二
 ================
-B0444150 李郁玟
+李郁玟
 
 作業完整說明[連結](https://docs.google.com/document/d/1aLGSsGXhgOVgwzSg9JdaNz2qGPQJSoupDAQownkGf_I/edit?usp=sharing)
 
@@ -413,7 +413,12 @@ chart3<-country_choropleth(Result3_1,title = "各個國家來台灣唸書的學�
 chart3
 ```
 
-![](InternationalStudents_files/figure-markdown_github/chart3-1.png) 小結:藉由以上資料，我們可以知道中國大陸來台的學生人數真的很多，遠遠大於其他國家倍數的人數，而因地理位置的關係，亞洲地區的人數又佔大多數，美國學生成了特別的例子，這可能也說明了台灣有一些競爭力，才會讓他們想來台灣留學吧。 \#\# 台灣學生國際交流分析
+![](InternationalStudents_files/figure-markdown_github/chart3-1.png)
+
+小結:藉由以上資料，我們可以知道中國大陸來台的學生人數真的很多，遠遠大於其他國家倍數的人數，而因地理位置的關係，亞洲地區的人數又佔大多數，美國學生成了特別的例子，這可能也說明了台灣有一些競爭力，才會讓他們想來台灣留學吧。
+
+台灣學生國際交流分析
+--------------------
 
 ### 資料匯入與處理
 
@@ -551,6 +556,8 @@ chart6
 ```
 
 ![](InternationalStudents_files/figure-markdown_github/chart6-1.png)
+
+小結:從上面的表格可以發現交換學生的學校，大部分都是在北部， 可以推測北部的學校可能資源比較多，也會較重視國際交流的部分。 在國家方面可以發現台灣學生喜歡去英文體系的國家， 提升英文能力變得越來越重要了。
 
 台灣學生出國留學分析
 --------------------
@@ -711,4 +718,6 @@ chart9<-ggplot()+geom_bar(data=compare2%>%head(30),
 chart9
 ```
 
-![](InternationalStudents_files/figure-markdown_github/analysis-1.png) 以上是畫圖的部分，利用子圖的方式，想同時呈現來台學生人數與留學人數的差距比較，但是由於中國大陸的數值相差太懸殊，所以顯得留學人數呈現部分只佔比較少數。
+![](InternationalStudents_files/figure-markdown_github/analysis-1.png)
+
+以上是畫圖的部分，利用子圖的方式，想同時呈現來台學生人數與留學人數的差距比較，但是由於中國大陸的數值相差太懸殊，所以顯得留學人數呈現部分只佔比較少數。

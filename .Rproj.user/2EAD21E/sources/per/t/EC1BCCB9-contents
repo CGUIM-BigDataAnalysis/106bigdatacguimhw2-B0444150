@@ -167,10 +167,12 @@ compare2<-gather(compare,key=種類,value=人數,來台學生人數,留學人數
 compare2<-compare2%>%arrange(desc(人數))
 #9_2圖.............................................
 compare2$國家 <- reorder(compare2$國別, compare2$人數)
-chart9<-ggplot()+geom_bar(data=compare2%>%head(50),
-                          aes(x=國家,y=人數),
-                          stat="identity")+
-  facet_grid(.~種類)+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
+chart9<-ggplot()+
+        geom_bar(data=compare2%>%head(50),
+                 aes(x=國家,y=人數),
+                 stat="identity")+
+        facet_grid(.~種類)+
+        theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
 chart9
+
 
