@@ -798,7 +798,8 @@ chart9<-ggplot()+
         geom_bar(data=compare2%>%head(20),
                  aes(x=國家,y=人數),
                  stat="identity")+
-        facet_grid(.~種類)+theme_bw()+
+        facet_grid(.~種類)+
+        theme_bw()+
         theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
 chart9
 ```
