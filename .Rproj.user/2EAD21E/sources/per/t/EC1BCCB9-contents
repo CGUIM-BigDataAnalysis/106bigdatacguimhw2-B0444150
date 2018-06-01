@@ -180,11 +180,10 @@ Q4_2<-student2%>%
 Q4_2%>%head(10)
 #承4，請用bar chart呈現台灣大專院校(全部)的學生去各國家進修交流人數(10分)。
 chart5<-ggplot()+
-  geom_bar(data=Q4_1_1,
-           aes(x=國別,y=學生人數),
-           stat="identity")+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
- 
+        geom_bar(data=Q4_1_1%>%head(30),
+                 aes(x=國別,y=學生人數),
+                 stat="identity")+
+        theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
 chart5
 
 #承4，請用面量圖呈現台灣大專院校的學生去各國家進修交流人數，人數越多顏色越深(10分)。
@@ -231,6 +230,7 @@ chart9<-ggplot()+
                  aes(x=國家,y=人數),
                  stat="identity")+
         facet_grid(.~種類)+
+        theme_bw()+
         theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5))
 chart9
 
